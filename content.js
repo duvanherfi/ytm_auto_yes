@@ -1,31 +1,42 @@
-function clickConfirmButton() {
-  // Selector típico del contenedor del modal y botón de confirmación en YouTube Music
-  const modalSelectors = [
-    'ytmusic-you-there-renderer #confirm-button',
-    'tp-yt-paper-dialog #confirm-button',
-    'yt-confirm-dialog-renderer #confirm-button'
-  ];
+// Función para confirmar la presencia y simular el clic en el botón "Sí"
+function handleYouTubeYouThereModal() {
+  // 1. Intentamos seleccionar el modal de inactividad
+  const dialog = document.querySelector('tp-yt-paper-dialog ytmusic-you-there-renderer');
+  
+  if (dialog) {
+    // Buscar el botón dentro de la estructura de YouTube
+    const confirmButton = dialog.querySelector('yt-button-renderer[dialog-confirm] button') || 
+                          dialog.querySelector('button[aria-label="Sí"]');
 
-  for (const selector of modalSelectors) {
-    const button = document.querySelector(selector);
-    if (button && button.offsetParent !== null) { // Verifica que el botón esté visible
-      console.log('[YTM Auto-Keep-Alive] Modal detectado. Confirmando reproducción...');
-      button.click();
-      return true;
+    if (confirmButton) {
+      console.log('[Auto-Confirm] Modal de inactividad detectado. Confirmando...');
+      confirmButton.click();
+    }
+
+    // 2. Por seguridad, forzamos la reanudación del reproductor si quedó pausado
+    const videoElement = document.querySelector('video');
+    if (videoElement && videoElement.paused) {
+      videoElement.play().catch(err => {
+        console.warn('[Auto-Confirm] No se pudo reanudar el reproductor automáticamente:', err);
+      });
     }
   }
-  return false;
 }
 
-// 1. Escuchar cambios dinámicos en el DOM para actuar inmediatamente
-const observer = new MutationObserver(() => {
-  clickConfirmButton();
+// Escuchar cambios en la estructura de la página (DOM)
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    if (mutation.addedNodes.length > 0) {
+      handleYouTubeYouThereModal();
+    }
+  }
 });
 
+// Iniciar la observación en todo el cuerpo de la página
 observer.observe(document.body, {
   childList: true,
   subtree: true
 });
 
-// 2. Respaldo por temporizador (cada 5 segundos) por si el modal ya estaba presente
-setInterval(clickConfirmButton, 5000);
+// Comprobación periódica alternativa (Safety Fallback) cada 3 segundos
+setInterval(handleYouTubeYouThereModal, 3000);
