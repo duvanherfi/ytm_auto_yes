@@ -37,8 +37,4 @@ Dado que es una extensión personalizada, puedes instalarla en tu navegador sigu
 ytmusic-auto-confirm/
 ├── manifest.json
 ├── content.js
-├── icons/
-│   ├── icon16.png
-│   ├── icon48.png
-│   └── icon128.png
 └── README.md
