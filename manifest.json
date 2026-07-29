@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Music - Auto Continuar",
+  "version": "1.0",
+  "description": "Cierra automáticamente el aviso de ¿Sigues ahí? en YouTube Music.",
+  "content_scripts": [
+    {
+      "matches": ["https://music.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
